@@ -1,0 +1,21 @@
+question,expected_type,actual_type,type_match,expected_disease,actual_disease,disease_match,actual_source,answer_preview
+What are the symptoms of diabetes?,symptoms,symptoms,True,diabetes,diabetes,True,Structured Knowledge Base,"increased thirst, frequent urination, hunger, fatigue, unexplained wei..."
+What causes diabetes?,causes,causes,True,diabetes,diabetes,True,Structured Knowledge Base,problems with insulin production or insulin action
+What are the treatments for diabetes?,treatment,treatment,True,diabetes,diabetes,True,Structured Knowledge Base,"lifestyle management, blood glucose monitoring, and medicines or insul..."
+How can diabetes be prevented?,prevention,prevention,True,diabetes,diabetes,True,Structured Knowledge Base,"healthy eating, regular physical activity, maintaining a healthy weigh..."
+What are the symptoms of malaria?,symptoms,symptoms,True,malaria,malaria,True,Structured Knowledge Base,"fever, chills, sweating, headache, nausea, vomiting, muscle pain"
+Who is at risk for malaria?,susceptibility,susceptibility,True,malaria,malaria,True,Structured Knowledge Base,travel or residence in areas where malaria transmission occurs
+How can malaria be prevented?,prevention,prevention,True,malaria,malaria,True,Structured Knowledge Base,"prevent mosquito bites, use insect repellent, and use mosquito nets in..."
+What causes malaria?,causes,causes,True,malaria,malaria,True,Structured Knowledge Base,infection with Plasmodium parasites transmitted through infected mosqu...
+What are the symptoms of dengue?,symptoms,symptoms,True,dengue,dengue,True,Structured Knowledge Base,"high fever, severe headache, muscle and joint pain, nausea, vomiting, ..."
+What causes dengue?,causes,causes,True,dengue,dengue,True,Structured Knowledge Base,infection with dengue virus transmitted through infected mosquitoes
+How can dengue be prevented?,prevention,prevention,True,dengue,dengue,True,Structured Knowledge Base,"prevent mosquito bites, remove standing water, and use insect repellen..."
+Who is at risk for dengue?,susceptibility,susceptibility,True,dengue,dengue,True,Structured Knowledge Base,living in or traveling to areas where dengue occurs and exposure to in...
+What are the symptoms of asthma?,symptoms,symptoms,True,asthma,asthma,True,Structured Knowledge Base,"wheezing, coughing, shortness of breath, chest tightness"
+What are the treatments for asthma?,treatment,treatment,True,asthma,asthma,True,Structured Knowledge Base,long-term control medicines and quick-relief medicines as prescribed b...
+What causes asthma?,causes,causes,True,asthma,asthma,True,Structured Knowledge Base,airway inflammation and sensitivity to various triggers
+How is tuberculosis diagnosed?,exams and tests,exams and tests,True,tuberculosis,tuberculosis,True,MedQuAD Semantic IR,Tuberculosis (TB) is a disease that is spread through the air from one...
+What are the symptoms of tuberculosis?,symptoms,symptoms,True,tuberculosis,tuberculosis,True,Structured Knowledge Base,"persistent cough, chest pain, fever, night sweats, weight loss, weakne..."
+What causes tuberculosis?,causes,causes,True,tuberculosis,tuberculosis,True,Structured Knowledge Base,infection with Mycobacterium tuberculosis bacteria
+Who won the FIFA World Cup?,unknown,unknown,True,(none),(none),True,No reliable source,"I'm sorry, I could not find a reliable answer to that question."
+What is the capital of France?,unknown,unknown,True,(none),(none),True,No reliable source,"I'm sorry, I could not find a reliable answer to that question."

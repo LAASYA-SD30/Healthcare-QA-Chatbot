@@ -1,0 +1,21 @@
+question,expected_type,expected_disease
+What are the symptoms of diabetes?,symptoms,diabetes
+What causes diabetes?,causes,diabetes
+What are the treatments for diabetes?,treatment,diabetes
+How can diabetes be prevented?,prevention,diabetes
+What are the symptoms of malaria?,symptoms,malaria
+Who is at risk for malaria?,susceptibility,malaria
+How can malaria be prevented?,prevention,malaria
+What causes malaria?,causes,malaria
+What are the symptoms of dengue?,symptoms,dengue
+What causes dengue?,causes,dengue
+How can dengue be prevented?,prevention,dengue
+Who is at risk for dengue?,susceptibility,dengue
+What are the symptoms of asthma?,symptoms,asthma
+What are the treatments for asthma?,treatment,asthma
+What causes asthma?,causes,asthma
+How is tuberculosis diagnosed?,exams and tests,tuberculosis
+What are the symptoms of tuberculosis?,symptoms,tuberculosis
+What causes tuberculosis?,causes,tuberculosis
+Who won the FIFA World Cup?,unknown,
+What is the capital of France?,unknown,

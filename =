@@ -1,0 +1,958 @@
+import streamlit as st
+
+from healthcare_backend import healthcare_chat
+
+
+# ============================================================
+# PAGE CONFIGURATION
+# ============================================================
+
+st.set_page_config(
+    page_title="Healthcare QA Chatbot",
+    page_icon="🩺",
+    layout="centered"
+)
+
+
+# ============================================================
+# CUSTOM CSS — PREMIUM DARK MEDICAL AI THEME
+# ============================================================
+
+st.markdown(
+    """
+    <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .stApp {
+        background:
+            radial-gradient(circle at 15% -10%, rgba(45, 212, 191, 0.14) 0%, transparent 40%),
+            radial-gradient(circle at 100% 10%, rgba(129, 140, 248, 0.10) 0%, transparent 45%),
+            radial-gradient(circle at 50% 100%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+            #060a0e;
+    }
+
+    header[data-testid="stHeader"] {
+        background-color: rgba(6, 10, 14, 0.85);
+        backdrop-filter: blur(6px);
+    }
+
+    .block-container {
+        max-width: 800px;
+        padding-top: 1.5rem;
+        padding-bottom: 6rem;
+        margin: 0 auto;
+    }
+
+    /* ---------------- HERO ---------------- */
+
+    .hero-wrap {
+        text-align: center;
+        padding: 18px 10px 8px 10px;
+        margin-bottom: 6px;
+    }
+
+    .hero-badge {
+        display: inline-block;
+        padding: 5px 14px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(45,212,191,0.15), rgba(56,189,248,0.12));
+        border: 1px solid rgba(45,212,191,0.35);
+        color: #5eead4;
+        font-size: 11.5px;
+        font-weight: 600;
+        letter-spacing: 1.2px;
+        margin-bottom: 16px;
+    }
+
+    .hero-title {
+        font-size: 40px;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin: 0 0 8px 0;
+        background: linear-gradient(90deg, #2dd4bf 0%, #38bdf8 50%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-subtitle {
+        color: #8b9aa5;
+        font-size: 15px;
+        font-weight: 400;
+        max-width: 480px;
+        margin: 0 auto 18px auto;
+        line-height: 1.5;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: rgba(45, 212, 191, 0.08);
+        border: 1px solid rgba(45, 212, 191, 0.25);
+        font-size: 12px;
+        font-weight: 600;
+        color: #5eead4;
+        letter-spacing: 0.5px;
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #2dd4bf;
+        box-shadow: 0 0 8px 2px rgba(45, 212, 191, 0.7);
+        animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+        0%   { opacity: 1; }
+        50%  { opacity: 0.35; }
+        100% { opacity: 1; }
+    }
+
+    .section-rule {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(45,212,191,0.25), transparent);
+        margin: 28px 0 20px 0;
+    }
+
+    /* ---------------- METRICS ---------------- */
+
+    .metric-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 14px;
+        padding: 16px 14px;
+        text-align: center;
+        backdrop-filter: blur(8px);
+        transition: border-color 0.2s ease;
+    }
+
+    .metric-card:hover {
+        border-color: rgba(45,212,191,0.35);
+    }
+
+    .metric-value {
+        font-size: 22px;
+        font-weight: 800;
+        background: linear-gradient(90deg, #2dd4bf, #38bdf8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 2px;
+    }
+
+    .metric-label {
+        font-size: 11.5px;
+        color: #7a8790;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    /* ---------------- SECTION HEADINGS ---------------- */
+
+    .section-heading {
+        font-size: 15px;
+        font-weight: 700;
+        color: #dfe7eb;
+        margin-bottom: 4px;
+    }
+
+    .section-subheading {
+        font-size: 13px;
+        color: #6b7880;
+        margin-bottom: 14px;
+    }
+
+    .group-heading {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #5eead4;
+        margin: 16px 0 8px 0;
+    }
+
+    /* ---------------- EMPTY STATE ---------------- */
+
+    .empty-state {
+        text-align: center;
+        padding: 26px 10px 6px 10px;
+    }
+
+    .empty-state-icon {
+        font-size: 34px;
+        margin-bottom: 10px;
+        filter: drop-shadow(0 0 14px rgba(45,212,191,0.45));
+    }
+
+    .empty-state-title {
+        font-size: 19px;
+        font-weight: 700;
+        color: #e5edf0;
+        margin-bottom: 6px;
+    }
+
+    .empty-state-sub {
+        font-size: 13.5px;
+        color: #7a8790;
+        margin-bottom: 22px;
+    }
+
+    /* ---------------- QUICK QUESTION CARDS (styled buttons) ---------------- */
+
+    div[data-testid="stButton"] > button {
+        width: 100%;
+        background: rgba(255,255,255,0.03) !important;
+        border: 1px solid rgba(255,255,255,0.08) !important;
+        color: #cdd7db !important;
+        border-radius: 12px !important;
+        padding: 10px 14px !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+        transition: all 0.18s ease !important;
+        white-space: normal !important;
+        height: auto !important;
+    }
+
+    div[data-testid="stButton"] > button:hover {
+        border-color: rgba(45,212,191,0.45) !important;
+        background: rgba(45,212,191,0.06) !important;
+        color: #5eead4 !important;
+        transform: translateY(-1px);
+    }
+
+    div[data-testid="stButton"] > button:focus {
+        box-shadow: 0 0 0 2px rgba(45,212,191,0.25) !important;
+    }
+
+    /* Sidebar clear-conversation button gets its own accent */
+    section[data-testid="stSidebar"] div[data-testid="stButton"] > button {
+        background: linear-gradient(90deg, #14b8a6, #0ea5e9) !important;
+        color: #ffffff !important;
+        border: none !important;
+        font-weight: 600 !important;
+        text-align: center !important;
+    }
+
+    /* ---------------- PIPELINE ---------------- */
+
+    .pipeline-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0px;
+        margin: 6px 0 4px 0;
+    }
+
+    .pipeline-card {
+        width: 100%;
+        max-width: 420px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 12px 16px;
+        text-align: center;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #dfe7eb;
+    }
+
+    .pipeline-card .pipeline-sub {
+        font-size: 11px;
+        font-weight: 400;
+        color: #7a8790;
+        margin-top: 2px;
+    }
+
+    .pipeline-arrow {
+        color: #2dd4bf;
+        font-size: 16px;
+        line-height: 1;
+        margin: 4px 0;
+    }
+
+    /* ---------------- INFO SOURCE CARDS ---------------- */
+
+    .source-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+    }
+
+    .source-card-title {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: #5eead4;
+        margin-bottom: 3px;
+    }
+
+    .source-card-sub {
+        font-size: 12px;
+        color: #8b9aa5;
+    }
+
+    /* ---------------- ACTIVE TOPIC ---------------- */
+
+    .topic-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: rgba(167, 139, 250, 0.09);
+        border: 1px solid rgba(167, 139, 250, 0.3);
+        font-size: 11.5px;
+        color: #c4b5fd;
+        margin-bottom: 14px;
+    }
+
+    .topic-badge .topic-label {
+        letter-spacing: 0.8px;
+        font-weight: 700;
+        color: #8b95f0;
+        font-size: 10px;
+    }
+
+    /* ---------------- CHAT ---------------- */
+
+    div[data-testid="stChatMessage"] {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 14px;
+        padding: 6px 8px;
+        margin-bottom: 10px;
+        backdrop-filter: blur(6px);
+    }
+
+    div[data-testid="stChatMessage"] p {
+        color: #dbe4e8 !important;
+        font-size: 14.5px;
+    }
+
+    .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+    }
+
+    .chip-source {
+        background: rgba(45, 212, 191, 0.09);
+        border: 1px solid rgba(45, 212, 191, 0.25);
+        color: #5eead4;
+    }
+
+    .chip-type {
+        background: rgba(129, 140, 248, 0.10);
+        border: 1px solid rgba(129, 140, 248, 0.28);
+        color: #b4bcfb;
+    }
+
+    .chip-topic {
+        background: rgba(56, 189, 248, 0.09);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        color: #7dd3fc;
+    }
+
+    /* ---------------- DIALOGUE FLOW ---------------- */
+
+    .flow-line {
+        font-size: 13px;
+        color: #cdd7db;
+        padding: 6px 0;
+    }
+
+    .flow-line b {
+        color: #5eead4;
+    }
+
+    .flow-arrow {
+        color: #4a555c;
+        font-size: 13px;
+        padding-left: 4px;
+    }
+
+    /* ---------------- EVAL SUMMARY ---------------- */
+
+    .eval-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        font-size: 13px;
+        color: #cdd7db;
+    }
+
+    .eval-row:last-child { border-bottom: none; }
+
+    .eval-row span.eval-score {
+        color: #5eead4;
+        font-weight: 700;
+    }
+
+    /* ---------------- SIDEBAR ---------------- */
+
+    section[data-testid="stSidebar"] {
+        background-color: #05080b;
+        border-right: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .sidebar-brand {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: #5eead4;
+        margin-bottom: 18px;
+        margin-top: 4px;
+    }
+
+    .sidebar-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 9px 10px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        color: #aab6bd;
+        font-weight: 500;
+        margin-bottom: 2px;
+    }
+
+    .sidebar-nav-item.active {
+        background: rgba(45,212,191,0.08);
+        color: #5eead4;
+        border: 1px solid rgba(45,212,191,0.2);
+    }
+
+    .nav-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        flex-shrink: 0;
+    }
+
+    .status-card {
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin: 14px 0 18px 0;
+    }
+
+    .status-card-title {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #5f6f78;
+        margin-bottom: 10px;
+    }
+
+    .status-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
+        color: #9aa5aa;
+        margin-bottom: 7px;
+    }
+
+    .status-line:last-child { margin-bottom: 0; }
+
+    .status-line-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #2dd4bf;
+        box-shadow: 0 0 6px 1px rgba(45,212,191,0.6);
+        flex-shrink: 0;
+    }
+
+    /* ---------------- CHAT INPUT ---------------- */
+
+    div[data-testid="stChatInput"] {
+        background-color: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 14px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    div[data-testid="stChatInput"]:focus-within {
+        border-color: rgba(45,212,191,0.5);
+        box-shadow: 0 0 0 3px rgba(45,212,191,0.12);
+    }
+
+    div[data-testid="stChatInput"] textarea {
+        color: #e5edf0 !important;
+    }
+
+    /* ---------------- EXPANDERS ---------------- */
+
+    div[data-testid="stExpander"] {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 12px;
+        margin-bottom: 10px;
+    }
+
+    /* ---------------- FOOTER ---------------- */
+
+    .app-footer {
+        text-align: center;
+        font-size: 11px;
+        color: #4a555c;
+        margin-top: 36px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* caption */
+    .stCaption, .stCaption p {
+        color: #5f6f78 !important;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
+# ============================================================
+# CONSTANTS
+# ============================================================
+
+USER_AVATAR = "🧑"
+ASSISTANT_AVATAR = "🩺"
+
+QUESTION_GROUPS = {
+    "SYMPTOMS": [
+        "What are the symptoms of malaria?",
+        "What are the symptoms of asthma?",
+    ],
+    "CAUSES & RISK": [
+        "What causes malaria?",
+        "Who is at risk for asthma?",
+    ],
+    "DIAGNOSIS & PREVENTION": [
+        "How is tuberculosis diagnosed?",
+        "How can malaria be prevented?",
+    ],
+}
+
+PIPELINE_STEPS = [
+    ("User Question", "The raw question typed or selected by the user"),
+    ("Question Classification", "Determines the question type (symptom, cause, risk, diagnosis, etc.)"),
+    ("Disease / Topic Detection", "Identifies the medical condition the question refers to"),
+    ("Knowledge Retrieval", "Queries the structured KB, MedQuAD, and Medical Wikipedia sources"),
+    ("Answer Generation", "Extracts and formats the factoid answer from the retrieved passage"),
+    ("Dialogue State / Follow-up Context", "Stores the current topic for handling follow-up questions"),
+]
+
+
+# ============================================================
+# SESSION STATE
+# ============================================================
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+if "current_topic" not in st.session_state:
+    st.session_state.current_topic = None
+
+if "pending_question" not in st.session_state:
+    st.session_state.pending_question = None
+
+
+def queue_question(text):
+    st.session_state.pending_question = text
+
+
+# ============================================================
+# SIDEBAR
+# ============================================================
+
+with st.sidebar:
+
+    st.markdown('<div class="sidebar-brand">HEALTHCARE AI</div>', unsafe_allow_html=True)
+
+    st.markdown(
+        """
+        <div class="sidebar-nav-item active"><span class="nav-dot"></span> Chat Assistant</div>
+        <div class="sidebar-nav-item"><span class="nav-dot"></span> Medical Knowledge</div>
+        <div class="sidebar-nav-item"><span class="nav-dot"></span> Conversation History</div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        """
+        <div class="status-card">
+            <div class="status-card-title">SYSTEM STATUS</div>
+            <div class="status-line"><span class="status-line-dot"></span> Retrieval Engine — Online</div>
+            <div class="status-line"><span class="status-line-dot"></span> Knowledge Base — Ready</div>
+            <div class="status-line"><span class="status-line-dot"></span> Semantic Search — Active</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    if st.button("🗑️  Clear Conversation", use_container_width=True):
+        st.session_state.messages = []
+        st.session_state.current_topic = None
+        st.session_state.pending_question = None
+        st.rerun()
+
+
+# ============================================================
+# HERO
+# ============================================================
+
+st.markdown(
+    """
+    <div class="hero-wrap">
+        <div class="hero-badge">AI-POWERED HEALTHCARE ASSISTANT</div>
+        <div class="hero-title">🩺 Healthcare QA Chatbot</div>
+        <div class="hero-subtitle">Intelligent medical question answering powered by semantic retrieval and structured knowledge.</div>
+        <div class="status-pill"><span class="status-dot"></span> AI SYSTEM ONLINE</div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
+# ============================================================
+# SYSTEM OVERVIEW / METRICS
+# ============================================================
+
+st.markdown('<div class="section-heading">System Overview</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subheading">Results from the project evaluation set.</div>', unsafe_allow_html=True)
+
+m1, m2, m3, m4 = st.columns(4)
+
+with m1:
+    st.markdown(
+        """
+        <div class="metric-card">
+            <div class="metric-value">100%</div>
+            <div class="metric-label">Question-Type Accuracy</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with m2:
+    st.markdown(
+        """
+        <div class="metric-card">
+            <div class="metric-value">100%</div>
+            <div class="metric-label">Disease Detection Accuracy</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with m3:
+    st.markdown(
+        """
+        <div class="metric-card">
+            <div class="metric-value">100%</div>
+            <div class="metric-label">Out-of-Domain Rejection</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with m4:
+    st.markdown(
+        """
+        <div class="metric-card">
+            <div class="metric-value">20</div>
+            <div class="metric-label">Evaluation Questions</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
+
+
+# ============================================================
+# QA PIPELINE
+# ============================================================
+
+st.markdown('<div class="section-heading">QA Pipeline</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subheading">How a question flows through the retrieval and dialogue system.</div>', unsafe_allow_html=True)
+
+pipeline_html = '<div class="pipeline-wrap">'
+for i, (title, sub) in enumerate(PIPELINE_STEPS):
+    pipeline_html += (
+        f'<div class="pipeline-card">{title}'
+        f'<div class="pipeline-sub">{sub}</div></div>'
+    )
+    if i < len(PIPELINE_STEPS) - 1:
+        pipeline_html += '<div class="pipeline-arrow">↓</div>'
+pipeline_html += '</div>'
+
+st.markdown(pipeline_html, unsafe_allow_html=True)
+
+st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
+
+
+# ============================================================
+# INFORMATION SOURCES
+# ============================================================
+
+st.markdown('<div class="section-heading">Information Sources</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subheading">Structured and semantic sources the retrieval engine draws from.</div>', unsafe_allow_html=True)
+
+st.markdown(
+    """
+    <div class="source-card">
+        <div class="source-card-title">MedQuAD</div>
+        <div class="source-card-sub">16,407 medical QA pairs</div>
+    </div>
+    <div class="source-card">
+        <div class="source-card-title">Medical Wikipedia</div>
+        <div class="source-card-sub">19,498 medical records</div>
+    </div>
+    <div class="source-card">
+        <div class="source-card-title">Structured Knowledge Base</div>
+        <div class="source-card-sub">Disease-specific structured facts</div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
+
+
+# ============================================================
+# DIALOGUE MANAGEMENT (expandable)
+# ============================================================
+
+with st.expander("💬  View Dialogue Flow"):
+    st.markdown(
+        """
+        <div class="flow-line"><b>User:</b> What are the symptoms of malaria?</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-line"><b>Disease detected:</b> malaria</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-line">Structured knowledge retrieved</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-line"><b>Assistant:</b> Returns malaria symptoms</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-line"><b>User:</b> Who is at risk for it?</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-line"><b>Dialogue manager:</b> Uses current topic = malaria</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-line"><b>Assistant:</b> Returns malaria susceptibility information</div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.caption("This example demonstrates how the dialogue manager resolves follow-up questions using the stored current topic.")
+
+
+# ============================================================
+# EVALUATION SUMMARY (expandable)
+# ============================================================
+
+with st.expander("📊  View Evaluation Summary"):
+    st.markdown(
+        """
+        <div class="eval-row"><span>Question-Type Accuracy</span><span class="eval-score">20/20 (100%)</span></div>
+        <div class="eval-row"><span>Disease Detection Accuracy</span><span class="eval-score">20/20 (100%)</span></div>
+        <div class="eval-row"><span>Out-of-Domain Rejection</span><span class="eval-score">2/2 (100%)</span></div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.caption("Results computed offline from qa_test_set.csv. This summary is static and does not re-run evaluation.")
+
+st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
+
+
+# ============================================================
+# SAMPLE QUESTIONS — "EXPLORE COMMON QUESTIONS"
+# ============================================================
+
+def render_question_group(key_prefix):
+    for group_name, questions in QUESTION_GROUPS.items():
+        st.markdown(f'<div class="group-heading">{group_name}</div>', unsafe_allow_html=True)
+        cols = st.columns(2)
+        for i, q in enumerate(questions):
+            with cols[i % 2]:
+                st.button(
+                    q,
+                    key=f"{key_prefix}_{group_name}_{i}",
+                    on_click=queue_question,
+                    args=(q,),
+                    use_container_width=True
+                )
+
+
+st.markdown('<div class="section-heading">Explore Common Questions</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-subheading">Tap a question to send it through the chatbot, or type your own below.</div>', unsafe_allow_html=True)
+render_question_group("explore")
+
+st.markdown('<hr class="section-rule">', unsafe_allow_html=True)
+
+
+# ============================================================
+# ACTIVE TOPIC (follow-up context)
+# ============================================================
+
+if st.session_state.current_topic:
+    st.markdown(
+        f"""
+        <div class="topic-badge">
+            <span class="topic-label">ACTIVE MEDICAL TOPIC</span>
+            {st.session_state.current_topic.capitalize()}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# ============================================================
+# CONVERSATION
+# ============================================================
+
+st.markdown('<div class="section-heading">Conversation</div>', unsafe_allow_html=True)
+
+if not st.session_state.messages:
+
+    st.markdown(
+        """
+        <div class="empty-state">
+            <div class="empty-state-icon">✦</div>
+            <div class="empty-state-title">Your medical questions, answered intelligently.</div>
+            <div class="empty-state-sub">Ask about symptoms, causes, prevention, diagnosis or treatment.</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+else:
+
+    st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+
+    for message in st.session_state.messages:
+
+        if message["role"] == "user":
+
+            with st.chat_message("user", avatar=USER_AVATAR):
+                st.write(message["content"])
+
+        else:
+
+            with st.chat_message("assistant", avatar=ASSISTANT_AVATAR):
+
+                st.write(message["content"])
+
+                source = message.get("source")
+                question_type = message.get("question_type")
+                topic = message.get("current_topic")
+
+                chips = ""
+                if source:
+                    chips += f'<span class="meta-chip chip-source">Source: {source}</span>'
+                if question_type:
+                    chips += f'<span class="meta-chip chip-type">Type: {question_type}</span>'
+                if topic:
+                    chips += f'<span class="meta-chip chip-topic">Topic: {topic}</span>'
+
+                if chips:
+                    st.markdown(f'<div class="meta-row">{chips}</div>', unsafe_allow_html=True)
+
+
+# ============================================================
+# PROCESS A QUESTION (shared by quick-question clicks and chat input)
+# ============================================================
+
+def process_question(question):
+
+    st.session_state.messages.append({
+        "role": "user",
+        "content": question
+    })
+
+    with st.spinner("Analyzing your question..."):
+        result = healthcare_chat(
+            question,
+            st.session_state.current_topic
+        )
+
+    answer = result.get("answer", "I'm sorry, I could not find a reliable answer.")
+    source = result.get("source", "No reliable source")
+    question_type = result.get("question_type", "unknown")
+    current_topic = result.get("current_topic", st.session_state.current_topic)
+
+    st.session_state.current_topic = current_topic
+
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": answer,
+        "source": source,
+        "question_type": question_type,
+        "current_topic": current_topic
+    })
+
+
+# ============================================================
+# HANDLE QUICK-QUESTION CLICK
+# ============================================================
+
+if st.session_state.pending_question:
+    q = st.session_state.pending_question
+    st.session_state.pending_question = None
+    process_question(q)
+    st.rerun()
+
+
+# ============================================================
+# CHAT INPUT
+# ============================================================
+
+question = st.chat_input("Ask about symptoms, causes, prevention, diagnosis...")
+
+if question:
+    process_question(question)
+    st.rerun()
+
+
+# ============================================================
+# FOOTER
+# ============================================================
+
+st.markdown(
+    """
+    <div class="app-footer">
+        AI-generated information is for educational purposes only<br>
+        and does not replace professional medical advice.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
